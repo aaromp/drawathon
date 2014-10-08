@@ -11,11 +11,21 @@ angular.module('drawathon.directives', [])
   }])
 
   .directive('sketch', [function() {
+    var link, options;
 
-    var link;
+    options = {
+      height: 480,
+      width: 640
+    };
 
     link = function(scope, element, attributes) {
-      console.log(element.find('canvas')[0]);
+      var canvas;
+      canvas = element.find('canvas')[0];
+
+      canvas.width = attributes.width || options.width;
+      canvas.height = attributes.height || options.height;
+
+      // console.log(canvas.width, canvas.height);
     };
 
     return {
