@@ -1,0 +1,20 @@
+<h2>Welcome to My AngularFire App</h2>
+<hr/>
+<p class="alert alert-danger" ng-show-auth="error">{{auth.error}}</p>
+<h4>Sync with all the drawathon users!!</h4>
+<div class="row">
+<div class="col-md-8"> 
+<input ng-model="syncedValue" type="text" class="form-control" placeholder="I think..."/> 
+</div>
+<div class="col-md-4">
+	<b>{{syncedValue}}</b>
+</div>
+</div>
+<br/><br/>
+<div class="row">
+<div class="col-md-12">
+	<label>
+		<p>Open <a target="_blank" ng-href="{{FBURL}}/syncedValue">Forge</a> or a <a target="_blank" href="#/">New window</a> to see this input update in real time:</p>
+	</label>
+	</div>
+</div>

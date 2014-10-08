@@ -1,0 +1,29 @@
+
+<button ng-click="logout()" class="btn btn-info pull-right">Log Out</button>
+<h2 class="text-center">My Account</h2>
+<div class="container">
+    <form class="form-signin" role="form">
+        <h2 class="form-signin-heading">Profile</h2>
+        <input type="text" class="form-control" placeholder="Name"  ng-model="user.name">
+        <input type="email" class="form-control" ng-model="user.email" placeholder="Email" >
+            <hr/>
+       <h2 class="form-signin-heading">Change Password</h2>
+        <input type="password" class="form-control" placeholder="Old Password"  ng-keypress="reset()" ng-model="oldpass">
+        <input type="password" class="form-control" placeholder="New Password"  ng-keypress="reset()" ng-model="newpass">
+        <input type="password" class="form-control" placeholder="Confirm Password"  ng-keypress="reset()" ng-model="confirm">
+        <br/>
+        <p class="alert alert-warning" ng-show="err">{{err}}</p>
+        <p class="alert alert-success" ng-show="msg">{{msg}}</p>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="updatePassword()">Update Password</button>
+          <hr/>
+       <h2 class="form-signin-heading">Change Email</h2>
+        <input type="email" class="form-control" placeholder="Email" ng-keypress="reset()" ng-model="newemail">
+        <input type="password" class="form-control" ng-keypress="reset()" ng-model="pass" placeholder="Password" >
+           <br/>
+           <p class="alert alert-warning" ng-show="emailerr">{{emailerr}}</p>
+            <p class="alert alert-success" ng-show="emailmsg">{{emailmsg}}</p>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="updateEmail()">Update Email</button>
+
+    </form>
+
+</div>

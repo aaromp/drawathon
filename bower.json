@@ -1,0 +1,10 @@
+{
+	"name": "drawathon",
+	"version": "0.1.0",
+	"description": "drawathon App",
+	"dependencies": {
+	    "bootstrap": "latest",
+	    "modernizr": "latest",
+	    "jquery": "1.11.0"
+	  }
+}
