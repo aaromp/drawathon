@@ -11,12 +11,13 @@ angular.module('drawathon.directives', [])
   }])
 
   .directive('sketch', ['firebaseRef', function(firebaseRef) {
-    var link, options, mousedown, inbounds, drawing, sketchDataRef, lastCoordinates;
+    var link, options, mousedown, inbounds, sketchDataRef, lastCoordinates, currentColor;
 
     options = {
       height: 480,
       width: 640,
-      pixels: 1
+      pixels: 1,
+      color: null
     };
 
     mousedown = false;
@@ -25,40 +26,34 @@ angular.module('drawathon.directives', [])
     lastCoordinates = null;
 
     sketchDataRef = firebaseRef();
-    console.log(sketchDataRef);
 
-    var handleMousedown, handleMouseout, handleMouseenter, handMouseup, draw;
+    var handleMousedown, handleMouseout, handleMouseenter, handleMouseup, sketch;
 
     handleMousedown = function(e) {
-      console.log('mousedown');
       mousedown = true;
-      draw.call(this, e);
+      sketch.call(this, e);
     };
 
     handleMouseenter = function() {
-      console.log('mouseenter');
       inbounds = true;
     };
 
     handleMouseout = function() {
-      console.log('mouseout');
       inbounds = true;
       lastCoordinates = null;
     };
 
-    handMouseup = function() {
-      console.log('mouseup');
+    handleMouseup = function() {
       mousedown = false;
       lastCoordinates = null;
     };
 
-    draw = function(e) {
+    sketch = function(e) {
       var xf, yf, xi, yi, dx, dy, sx, sy, err;
       e.preventDefault();
-      console.log(e);
 
-      xf = Math.floor((e.pageX - this.canvas.offsetLeft) / 1 - 1);
-      yf = Math.floor((e.pageY - this.canvas.offsetTop) / 1 - 1);
+      xf = Math.floor((e.pageX - this.canvas.offsetLeft) / this.pixels - 1);
+      yf = Math.floor((e.pageY - this.canvas.offsetTop) / this.pixels - 1);
       xi = (lastCoordinates === null) ? xf : lastCoordinates[0];
       yi = (lastCoordinates === null) ? yf : lastCoordinates[1];
       dx = Math.abs(xf - xi);
@@ -67,12 +62,8 @@ angular.module('drawathon.directives', [])
       sy = (yi < yf) ? 1 : -1;
       err = dx - dy;
 
-      drawing = mousedown && inbounds;
-
       while (true) {
-        //write the pixel into Firebase, or if we are drawing white, remove the pixel
-        // pixelDataRef.child(xi + ":" + yi).set(currentColor === "fff" ? null : currentColor);
-        if(drawing) this.context.fillRect(xi, yi, 1, 1);
+        if(mousedown && inbounds) sketchDataRef.child(xi + ':' + yi).set(this.color);
 
         if (xi === xf && yi === yf) break;
 
@@ -92,22 +83,41 @@ angular.module('drawathon.directives', [])
       lastCoordinates = [xf, yf];
     };
 
+    var draw, clear;
+
+    draw = function(snapshot) {
+      var coordinate = snapshot.name().split(':');
+      this.context.fillStyle = '#' + snapshot.val();
+      this.context.fillRect(parseInt(coordinate[0]) * this.pixels, parseInt(coordinate[1]) * this.pixels, this.pixels, this.pixels);
+    };
+
+    clear = function(snapshot) {
+      var coordinate = snapshot.name().split(':');
+      this.context.clearRect(parseInt(coordinate[0]) * this.pixels, parseInt(coordinate[1]) * this.pixels, this.pixels, this.pixels);
+    };
+
     link = function(scope, element, attributes) {
       var canvas, context;
       scope.canvas = element.find('canvas')[0];
       scope.context = scope.canvas.getContext('2d');
 
+      scope.pixels = attributes.pixels || options.pixels;
+      scope.color = attributes.color || options.color;
+
       scope.canvas.width = attributes.width || options.width;
       scope.canvas.height = attributes.height || options.height;
 
-      scope.canvas.onmousemove = draw.bind(scope);
-      
+      scope.canvas.onmousemove = sketch.bind(scope);
+  
       scope.canvas.onmousedown = handleMousedown.bind(scope);
-      document.onmouseup = handMouseup;
+      document.onmouseup = handleMouseup;
 
       scope.canvas.onmouseenter = handleMouseenter;
       scope.canvas.onmouseout = handleMouseout;
 
+      sketchDataRef.on('child_added', draw.bind(scope));
+      sketchDataRef.on('child_changed', draw.bind(scope));
+      sketchDataRef.on('child_removed', clear.bind(scope));
     };
 
     return {
