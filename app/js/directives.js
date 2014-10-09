@@ -63,7 +63,7 @@ angular.module('drawathon.directives', [])
       err = dx - dy;
 
       while (true) {
-        if(mousedown && inbounds) sketchDataRef.child(xi + ':' + yi).set(this.color);
+        if(mousedown && inbounds) sketchDataRef.child(xi + ', ' + yi).set(this.color);
 
         if (xi === xf && yi === yf) break;
 
@@ -86,8 +86,8 @@ angular.module('drawathon.directives', [])
     var draw, clear;
 
     draw = function(snapshot) {
-      var coordinate = snapshot.name().split(':');
-      this.context.fillStyle = '#' + snapshot.val();
+      var coordinate = snapshot.name().split(', ');
+      this.context.fillStyle = snapshot.val();
       this.context.fillRect(parseInt(coordinate[0]) * this.pixels, parseInt(coordinate[1]) * this.pixels, this.pixels, this.pixels);
     };
 
